@@ -1,20 +1,59 @@
 var createError = require('http-errors');
 var express = require('express');
+const session = require('express-session');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+const passport = require('passport');
+const LocalStrategy = reuquire('passport-local').Strategy;
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
-var app = express();
-
+const mongoDB = process.env.MONGO_DB_URL;
+mongoose.connect(mongoDB, {useUnifiedTopoligy: true, useNewUrlParser: true});
+const db = mongoose.connection;
+db.on('error', console.error.bind(console, 'mongo connection error:'));
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
+var app = express();
+
 app.use(logger('dev'));
 app.use(express.json());
+
+passport.serializeUser(function(user, done) {
+  done(null, user.id);
+});
+
+passport.deserializeUser(function(id, done) {
+  User.findById(id, function(err, user) {
+    done(err, user);
+  });
+});
+
+passport.use(
+  new LocalStrategy((username, password, done) => {
+    User.findOne({username}, (err, user) => {
+      if (err) { 
+        return done(err); 
+      }
+      if (!user) {
+        return done(null, false, {message: 'Invalid login'});
+      }
+      if (user.hashedPassword !== password) {
+        return done(null, false, {message: 'Invalid login'});
+      }
+      return done(null, user);
+    });
+  })
+);
+
+app.use(passport.initialize());
+app.use(passport.session());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));

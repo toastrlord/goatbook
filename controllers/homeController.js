@@ -27,8 +27,29 @@ exports.home_create_account_post = function(req, res, next) {
     }
 }
 
+/*
 exports.home_login_post = function(req, res, next) {
+    body('username').trim().isLength({min: 10, max: 20}).withMessage('Please enter your username').escape(),
+    body('password').trim().isLength({min: 5, max: 20}).withMessage('Passwords are between 5 and 20 characters long').escape(),
+    (req, res, next) => {
+        User.find({'username': req.body.username})
+        .exec(function(err, user) {
+            if (user) {
+                bcrypt.compare(req.body.password, user.password, function (err, res) {
+                    if (res) {
+                        res.redirect('/' + req.body.username);
+                    }
+                }); 
+            }
+        });
+    }
+}*/
 
+exports.home_login_post = function(req, res, next) {
+    passport.authenticate('local', {
+        successRedirect: '/',
+        failureRedirect: '/'
+    });
 }
 
 exports.home_create_account_get = function(req, res, next) {
