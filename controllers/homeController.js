@@ -1,4 +1,5 @@
-const { body, validationResult } = require("express-validator");
+const { body, validationResult } = require('express-validator');
+const User = require('../models/user');
 
 exports.home_get = function(req, res, next) {
     res.render('home');
@@ -26,10 +27,10 @@ exports.home_create_account_post = function(req, res, next) {
     }
 }
 
-exports.home_create_account_get = function(req, res, next) {
-    res.render('signup-form');
+exports.home_login_post = function(req, res, next) {
+
 }
 
-exports.home_create_post = function(req, res, next) {
-
+exports.home_create_account_get = function(req, res, next) {
+    res.render('signup-form');
 }
