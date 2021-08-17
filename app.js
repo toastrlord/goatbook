@@ -1,26 +1,27 @@
 var createError = require('http-errors');
 var express = require('express');
-const session = require('express-session');
+//const session = require('express-session');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const passport = require('passport');
-const LocalStrategy = reuquire('passport-local').Strategy;
+const LocalStrategy = require('passport-local').Strategy;
 const mongoose = require('mongoose');
+require('dotenv').config();
 const Schema = mongoose.Schema;
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
 const mongoDB = process.env.MONGO_DB_URL;
-mongoose.connect(mongoDB, {useUnifiedTopoligy: true, useNewUrlParser: true});
+mongoose.connect(mongoDB, {useUnifiedTopology: true, useNewUrlParser: true});
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'mongo connection error:'));
+
+var app = express();
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
-
-var app = express();
 
 app.use(logger('dev'));
 app.use(express.json());
