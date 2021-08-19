@@ -1,6 +1,6 @@
 var createError = require('http-errors');
 var express = require('express');
-//const session = require('express-session');
+const session = require('express-session');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
@@ -8,6 +8,7 @@ const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const User = require('./models/user');
 require('dotenv').config();
 const Schema = mongoose.Schema;
 
@@ -39,23 +40,29 @@ passport.deserializeUser(function(id, done) {
 
 passport.use(
   new LocalStrategy((username, password, done) => {
-    User.findOne({username}, (err, user) => {
+    User.findOne({username: username}, (err, user) => {
       if (err) { 
         return done(err); 
       }
       if (!user) {
         return done(null, false, {message: 'Invalid login'});
       }
-      bcrypt.compare(password, user.hashedPassword, (err, result) => {
+      bcrypt.compare(password, user.passwordHash, (err, result) => {
+        if (err) {
+          return done(err);
+        }
         if (result) {
+          return done(null, user);
+        }
+        else {
           return done(null, false, {message: 'Invalid login'});
         }
       });
-      return done(null, user);
     });
   })
 );
 
+app.use(session({ secret: 'jfahfaughauighapw'}));
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(express.urlencoded({ extended: false }));

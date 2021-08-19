@@ -1,12 +1,5 @@
 extends layout
 
 block content
-    p Log in!
-    form(method='POST' action='')
-        label(for='username') Username
-        input(type='text' name='username')
-        label(for='password') Password
-        input(type='password' name='password')
-        button(type='submit') Submit
-    p Not a member?
-    a(href='/sign-up') Sign up today!
+    p Welcome to the homepage, #{user}!
+    a(href='/logout') Log out!
