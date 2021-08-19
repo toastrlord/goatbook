@@ -9,3 +9,7 @@ block content
         lable(for='confirm-password') Confirm Password 
         input(type='password' name='confirm-password')
         button(type='submit') Submit
+    if errors
+        ul
+            for error in errors 
+                li=error.msg

@@ -7,6 +7,7 @@ var logger = require('morgan');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
 require('dotenv').config();
 const Schema = mongoose.Schema;
 
@@ -45,9 +46,11 @@ passport.use(
       if (!user) {
         return done(null, false, {message: 'Invalid login'});
       }
-      if (user.hashedPassword !== password) {
-        return done(null, false, {message: 'Invalid login'});
-      }
+      bcrypt.compare(password, user.hashedPassword, (err, result) => {
+        if (result) {
+          return done(null, false, {message: 'Invalid login'});
+        }
+      });
       return done(null, user);
     });
   })

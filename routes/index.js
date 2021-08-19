@@ -4,6 +4,8 @@ const homeController = require('../controllers/homeController');
 
 router.get('/', homeController.home_get);
 
+router.post('/', homeController.login_post);
+
 router.get('/sign-up', homeController.home_create_account_get);
 
 router.post('/sign-up', homeController.home_create_account_post);
