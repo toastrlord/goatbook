@@ -1,0 +1,14 @@
+doctype html 
+html 
+    head
+        link(rel='stylesheet', href='/stylesheets/style.css')
+    body
+        div(class='navbar-container')
+            a(href='/home')
+            form(method='POST' action='/search')
+                input(name='search' type='text')
+                button(type='Submit') Search
+            a(href='/friends') Friends
+            a(href='/groups') Groups
+            a(href='/logout') Log out!
+        block content

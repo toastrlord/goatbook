@@ -1,0 +1,10 @@
+extends top-bar 
+
+block content 
+    if users.length
+        ul
+            for user in users
+                li
+                    a(href=user.url) #{user.username}
+    else 
+        p No results found!

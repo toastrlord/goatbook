@@ -12,3 +12,20 @@ exports.home_get = function(req, res, next) {
         res.redirect('/');
     }
 }
+
+exports.search_get = function(res, req, next) {
+
+}
+
+exports.search_post = [
+    body('search').isLength({min: 1}).escape(),
+    (req, res, next) => {
+        const errors = validationResult(req.body);
+        if (errors.isEmpty()) {
+            User.find({ username: {'$regex': req.body.search, '$options': 'i'}}).exec((err, users) => {
+                if (err) { return next(err); }
+                res.render('search-results', { users: users});
+            });
+        }
+    }
+];
