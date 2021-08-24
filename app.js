@@ -62,12 +62,24 @@ passport.use(
   })
 );
 
+const verifyLogin = function(req, res, next) {
+  const noLogonRequiredPaths = ['/', '/sign-up'];
+  if (noLogonRequiredPaths.includes(req.path)) {
+    return next();
+  }
+  if (req.isAuthenticated()) {
+    return next();
+  }
+  res.redirect('/');
+}
+
 app.use(session({ secret: 'jfahfaughauighapw'}));
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(verifyLogin);
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
