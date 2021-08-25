@@ -20,10 +20,14 @@ router.post('/search', homeController.search_post);
 
 router.get('/users/:id', userController.user_get);
 
+router.get('/notifications', userController.notifications_get);
+
 router.post('/users/addfriend/:destUserId/:originUserId', userController.user_friend_request_update);
 
 router.post('/users/removefriend/:destUserId/:originUserId', userController.user_friend_remove_update);
 
 router.post('/users/ignorerequest/:destUserId/:originUserId', userController.user_friend_ignore_update);
+
+router.post('/users/acceptrequest/:destUserId/:originUserId', userController.user_friend_accept_update);
 
 module.exports = router;

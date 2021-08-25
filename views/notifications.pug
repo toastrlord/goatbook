@@ -1,0 +1,10 @@
+extends top-bar
+
+block content
+    ul
+        for request in friendRequests
+            p=request.username
+            form(method='POST' action='users/acceptrequest/' + currentUserId + '/' + request._id)
+                button Accept Request
+            form(method='POST' action='users/ignorerequest/' + currentUserId + '/' + request._id)
+                button Ignore Request
