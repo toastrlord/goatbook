@@ -1,10 +1,15 @@
 extends top-bar 
 
 block content 
-    if users.length
+    if users && users.length
         ul
             for user in users
                 li
                     a(href=user.url) #{user.username}
+    else if groups && groups.length
+        ul
+            for group in groups
+                li
+                    a(href=group.url) #{group.name}
     else 
         p No results found!

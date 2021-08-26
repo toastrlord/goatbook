@@ -6,9 +6,14 @@ html
         div(class='navbar-container')
             a(href='/home')
             form(method='POST' action='/search')
-                input(name='search' type='text')
+                input(name='search' type='text' )
                 button(type='Submit') Search
+                label(for='type') Search for:
+                select(name='type')
+                    option(value='users') Users
+                    option(value='groups') Groups
             a(href='/friends') Friends
             a(href='/groups') Groups
             a(href='/logout') Log out!
         block content
+        
