@@ -1,0 +1,12 @@
+extends top-bar 
+block content
+    form(method='POST' action='')
+        label(for='name') Group Name:
+        input(type='text' name='name')
+        label(for='privacy') Private Group?
+        input(type='checkbox' name='privacy')
+        button Create Group
+    if errors
+        ul
+            for error in errors
+                li=error.msg

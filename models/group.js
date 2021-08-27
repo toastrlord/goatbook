@@ -3,9 +3,21 @@ const Schema = mongoose.Schema;
 
 const GroupSchema = new Schema({
     name: {type: String, required: true, minLength: 5},
-    members: [Schema.Types.ObjectId],
+    members: [
+        {
+            user: 
+            {
+                type: Schema.Types.ObjectId, 
+                required: true
+            },
+            permission: 
+            {
+                type: Schema.Types.String, 
+                values: ['owner', 'admin', 'user', 'readonly'], 
+                required: true
+            }}],
     posts: [Schema.Types.ObjectId],
-    isPublic: {type: Schema.Types.Boolean, required: true}
+    isPrivate: {type: Schema.Types.Boolean, required: true}
 });
 
 GroupSchema.virtual('url').get(function() {

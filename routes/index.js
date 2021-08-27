@@ -3,6 +3,7 @@ var router = express.Router();
 const loginController = require('../controllers/loginController');
 const homeController = require('../controllers/homeController');
 const userController = require('../controllers/userController');
+const groupController = require('../controllers/groupController');
 
 router.get('/', loginController.login_get);
 
@@ -29,5 +30,13 @@ router.post('/users/removefriend/:destUserId/:originUserId', userController.user
 router.post('/users/ignorerequest/:destUserId/:originUserId', userController.user_friend_ignore_update);
 
 router.post('/users/acceptrequest/:destUserId/:originUserId', userController.user_friend_accept_update);
+
+router.get('/groups', groupController.group_summary_get);
+
+router.get('/groups/create', groupController.group_create_get);
+
+router.post('/groups/create', groupController.group_create_post);
+
+router.get('/groups/:groupId', groupController.group_detail_get);
 
 module.exports = router;
