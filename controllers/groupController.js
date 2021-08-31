@@ -4,8 +4,11 @@ const {body, validationResult} = require('express-validator');
 const async = require('async');
 
 exports.group_summary_get = function(req, res, next) {
-    // TODO: 
-    res.render('group');
+    Group.find({isPrivate: false})
+    .exec((err, groups) => {
+        if (err) { return next(err); }
+        res.render('groups/group-summary', {groups});
+    });
 }
 
 exports.group_detail_get = function(req, res, next) {
@@ -34,25 +37,20 @@ exports.group_detail_get = function(req, res, next) {
                 -if owner, display above AND ability to delete group with confirm 
         */
         const {group, currentUser} = results;
-        console.log(group);
-        if (!group.isPrivate) {
-            // continue as normal
+        const currentMember = group.members.filter(member => member._id === currentUser._id);
+        if (group.isPrivate) {
+            res.render('private group');
+            return;
         }
-        else {
-            if (group.members.filter(member => member._id === req.user._id)) {
-                // current user is a member, go ahead and display
-            }
-            else {
-                res.render('private group');
-                return;
-            }
-        }
-        res.render('group', {groupName: group.name, members: group.members});
+        res.render('groups/group', {
+            groupName: group.name, 
+            members: group.members, 
+            permission: currentMember ? currentMember.permission : 'none'});
     });
 }
 
 exports.group_create_get = function(req, res, next) {
-    res.render('group-form');
+    res.render('groups/group-form');
 }
 
 exports.group_create_post = [
@@ -74,15 +72,57 @@ exports.group_create_post = [
             });
         }
         else {
-            res.render('group-form', { errors: errors.array() });
+            res.render('groups/group-form', { errors: errors.array() });
         }
     }  
 ];
 
 exports.group_delete_post = function(req, res, next) {
-
+    Group.findById(req.params.groupId).exec((err, theGroup) => {
+        if (err) { next(err); }
+        if (theGroup.members.filter(member => member._id === req.user._id && member.permission === 'owner')) {
+            Group.delete({_id: req.params.groupId});
+            res.redirect('/groups');
+        }
+        else {
+            // TODO: render access denied error
+            res.redirect('/groups');
+        }
+    });
 }
 
-exports.group_update_post = function(req, res, next) {
+exports.group_add_member_post = function(req, res, next) {
+    Group.findById(req.params.groupId).exec((err, theGroup) => {
+        if (err) { return next(err); }
+        const member = theGroup.members.filter(member => member._id === req.user._id)[0];
+        if (member.permission === 'owner' || member.permission === 'admin') {
+            Group.findByIdAndUpdate(theGroup._id, {$push: {members: {user: req.params.userId, permission: 'member'}}}, (err) => {
+                if (err) { return next(err); }
+                res.redirect(theGroup.url);
+            });
+        }
+        else {
+            // TODO: render access denied error
+            res.redirect(theGroup.url);
+        }
+    });
+}
 
+// TODO: need to handle user leaving on their own- right now won't work unless they're an owner or admin
+// also handle the owner trying to leave their own group- prevent this and prompt them to delete group instead
+exports.group_remove_member_post = function(req, res, next) {
+    Group.findById(req.params.groupId).exec((err, theGroup) => {
+        if (err) { return next(err); }
+        const member = theGroup.members.filter(member => member._id === req.user._id)[0];
+        if (member.permission === 'owner' || member.permission === 'admin') {
+            Group.findByIdAndUpdate(theGroup._id, {$pull: {members: {user: req.params.userId}}}, (err) => {
+                if (err) { return next(err); }
+                res.redirect(theGroup.url);
+            });
+        }
+        else {
+            // TODO: render access denied error
+            res.redirect(theGroup.url);
+        }
+    });
 }

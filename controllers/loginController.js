@@ -2,6 +2,7 @@ const { body, validationResult } = require('express-validator');
 const User = require('../models/user');
 const bcrypt = require('bcryptjs');
 const passport = require('passport');
+const mailer = require('../mailer');
 
 const saltRounds = 10;
 

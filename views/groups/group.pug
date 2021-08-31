@@ -1,0 +1,16 @@
+extends ./../top-bar
+
+block content
+    a(href='/groups') Back to Groups
+    p=groupName 
+    ul
+        for member in members
+            li=member._id.username
+                if (member._id !== id) && (member.permission !== 'admin' && permission === 'admin') || permission === 'owner'
+                    button Remove Member
+    if permission === 'owner'
+        form(method='post' action='groups/delete/' + group._id)
+            button Delete Group
+    else if isMember
+        form(method='post' action='groups/leave/' + group._id + '/' + id)
+            button Leave Group

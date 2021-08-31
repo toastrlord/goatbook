@@ -1,10 +1,10 @@
-extends top-bar 
+extends ./../top-bar
 block content
     form(method='POST' action='')
         label(for='name') Group Name:
-        input(type='text' name='name')
+        input(type='text' name='name' value=name)
         label(for='privacy') Private Group?
-        input(type='checkbox' name='privacy')
+        input(type='checkbox' name='privacy' value=isPrivate)
         button Create Group
     if errors
         ul

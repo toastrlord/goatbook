@@ -37,6 +37,10 @@ router.get('/groups/create', groupController.group_create_get);
 
 router.post('/groups/create', groupController.group_create_post);
 
+router.post('/groups/addmember/:userId/:groupId', groupController.group_add_member_post);
+
+router.post('/groups/removemember/:userId/:groupId', groupController.group_remove_member_post);
+
 router.get('/groups/:groupId', groupController.group_detail_get);
 
 module.exports = router;
