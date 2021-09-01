@@ -2,9 +2,9 @@ extends ./../top-bar
 block content
     form(method='POST' action='')
         label(for='name') Group Name:
-        input(type='text' name='name' value=name)
+        input(type='text' name='name' value=name ? name : '')
         label(for='privacy') Private Group?
-        input(type='checkbox' name='privacy' value=isPrivate)
+        input(type='checkbox' name='privacy' value=isPrivate ? isPrivate : false)
         button Create Group
     if errors
         ul

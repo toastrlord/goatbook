@@ -37,12 +37,13 @@ exports.group_detail_get = function(req, res, next) {
                 -if owner, display above AND ability to delete group with confirm 
         */
         const {group, currentUser} = results;
-        const currentMember = group.members.filter(member => member._id === currentUser._id);
+        const currentMember = group.members.filter(member => member.user._id === currentUser._id);
+        console.log(group.members);
         if (group.isPrivate) {
             res.render('private group');
             return;
         }
-        res.render('groups/group', {
+        res.render('groups/group-detail', {
             groupName: group.name, 
             members: group.members, 
             permission: currentMember ? currentMember.permission : 'none'});
@@ -80,7 +81,7 @@ exports.group_create_post = [
 exports.group_delete_post = function(req, res, next) {
     Group.findById(req.params.groupId).exec((err, theGroup) => {
         if (err) { next(err); }
-        if (theGroup.members.filter(member => member._id === req.user._id && member.permission === 'owner')) {
+        if (theGroup.members.filter(member => member.user._id === req.user._id && member.permission === 'owner')) {
             Group.delete({_id: req.params.groupId});
             res.redirect('/groups');
         }
@@ -94,8 +95,12 @@ exports.group_delete_post = function(req, res, next) {
 exports.group_add_member_post = function(req, res, next) {
     Group.findById(req.params.groupId).exec((err, theGroup) => {
         if (err) { return next(err); }
-        const member = theGroup.members.filter(member => member._id === req.user._id)[0];
+        const member = theGroup.members.filter(member => member.user._id === req.user._id)[0];
         if (member.permission === 'owner' || member.permission === 'admin') {
+            if (theGroup.members.filter(member => member.user._id = req.params.userId)) {
+                // user is already in the group- don't add them again
+                return res.redirect(theGroup.url);
+            }
             Group.findByIdAndUpdate(theGroup._id, {$push: {members: {user: req.params.userId, permission: 'member'}}}, (err) => {
                 if (err) { return next(err); }
                 res.redirect(theGroup.url);
@@ -113,8 +118,23 @@ exports.group_add_member_post = function(req, res, next) {
 exports.group_remove_member_post = function(req, res, next) {
     Group.findById(req.params.groupId).exec((err, theGroup) => {
         if (err) { return next(err); }
-        const member = theGroup.members.filter(member => member._id === req.user._id)[0];
-        if (member.permission === 'owner' || member.permission === 'admin') {
+        let validOperation = false;
+        const member = theGroup.members.filter(member => member.user._id === req.user._id)[0];
+        if (!member) {
+            return res.redirect(theGroup.url);
+        }
+        if (member.user._id === req.params.userId) {
+            // this user is leaving- allow them to do so, only if they do not have an "owner" permission level
+            if (member.permission !== 'owner') {
+                // TODO: show error message- must delete group if owner
+                validOperation = true;
+            }
+        }
+        else if (member.permission === 'owner' || member.permission === 'admin') {
+            validOperation = true;
+        }
+
+        if (validOperation) {
             Group.findByIdAndUpdate(theGroup._id, {$pull: {members: {user: req.params.userId}}}, (err) => {
                 if (err) { return next(err); }
                 res.redirect(theGroup.url);
@@ -125,4 +145,21 @@ exports.group_remove_member_post = function(req, res, next) {
             res.redirect(theGroup.url);
         }
     });
+}
+
+exports.group_modify_member_post = function(req, res, next) {
+    const newPermission = req.params.permission;
+    // cannot set permission to owmer- this can only be achieved by creating a group
+    if (newPermission === 'admin' || newPermission === 'member' || newPermission === 'readonly') {
+        Group.findByIdAndUpdate(req.params.groupId, 
+            {_id: req.params.userId},
+            {$set: {permission: newPermission}}, (err, result) => {
+                if (err) { return next(err); }
+                res.redirect(result.url);
+            });
+    }
+    else {
+        // TODO: error!
+        res.redirect(result.url);
+    }
 }

@@ -41,6 +41,8 @@ router.post('/groups/addmember/:userId/:groupId', groupController.group_add_memb
 
 router.post('/groups/removemember/:userId/:groupId', groupController.group_remove_member_post);
 
+router.post('/groups/modifymember/:userId/:groupId', groupController.group_modify_member_post);
+
 router.get('/groups/:groupId', groupController.group_detail_get);
 
 module.exports = router;
