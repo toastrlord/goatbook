@@ -14,3 +14,5 @@ block content
     else if isMember
         form(method='post' action='groups/leave/' + group._id + '/' + id)
             button Leave Group
+    if permission === 'owner' || permission === 'admin'
+        a(href='/invite/' + group._id) Invite Members

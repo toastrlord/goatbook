@@ -1,0 +1,14 @@
+extends ./../top-bar
+
+block content
+    a(href='/groups/' + group._id) Back to Group Page
+    if friends.length
+        ul
+            for friend in friends
+                li
+                    p=friend.username
+                    form(method='POST' action='/' + group._id + '/' + friend._id)
+                        button(disabled=friend.isMember) Add to Group
+    else
+        p No friends to invite
+

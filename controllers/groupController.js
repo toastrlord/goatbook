@@ -20,9 +20,9 @@ exports.group_detail_get = function(req, res, next) {
             Group.findById(req.params.groupId).populate({
                 path: 'members',
                 populate: {
-                    path: '_id',
-                    model: 'User'
-                }
+                    path: 'user', //FIXME: only emit _id and username
+                    model: User
+                },
             }).exec(callback);
         }
     }, function(err, results) {
@@ -37,7 +37,8 @@ exports.group_detail_get = function(req, res, next) {
                 -if owner, display above AND ability to delete group with confirm 
         */
         const {group, currentUser} = results;
-        const currentMember = group.members.filter(member => member.user._id === currentUser._id);
+        const currentMember = group.members.find(member => member.user._id === currentUser._id);
+        console.log(currentMember);
         console.log(group.members);
         if (group.isPrivate) {
             res.render('private group');
@@ -47,6 +48,26 @@ exports.group_detail_get = function(req, res, next) {
             groupName: group.name, 
             members: group.members, 
             permission: currentMember ? currentMember.permission : 'none'});
+    });
+}
+
+exports.group_invite_get = function(req, res, next) {
+    async.parallel({
+        group: function(callback) {
+            Group.findById(req.params.groupId).exec(callback);
+        },
+        user: function(callback) {
+            User.findById(req.user._id).populate('friends', 'username _id').exec(callback);
+        }
+    }, function(err, results) {
+        if (err) { return next(err); }
+        const {user, group} = results;
+        const groupMembers = group.members;
+        const friends = user.friends.map(friend => {
+            const isMember = group.members.find(member => member._id === friend._id);
+            return {username: friend.username, _id: friend._id, isMember};
+        });
+        res.render('groups/group-invite', {group, friends});
     });
 }
 
