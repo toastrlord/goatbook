@@ -1,9 +1,14 @@
 var express = require('express');
+const userController = require('../controllers/userController');
 var router = express.Router();
 
-/* GET users listing. */
-router.get('/', function(req, res, next) {
-  res.send('respond with a resource');
-});
+router.post('/users/addfriend/:destUserId/:originUserId', userController.user_friend_request_update);
+
+router.post('/users/removefriend/:destUserId/:originUserId', userController.user_friend_remove_update);
+
+router.post('/users/ignorerequest/:destUserId/:originUserId', userController.user_friend_ignore_update);
+
+router.post('/users/acceptrequest/:destUserId/:originUserId', userController.user_friend_accept_update);
+
 
 module.exports = router;

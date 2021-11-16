@@ -52,13 +52,6 @@ exports.create_account_post = [
     }
 ];
 
-/*
-exports.login_post = passport.authenticate('local', {
-    successRedirect: '/home',
-    failureRedirect: '/'
-});
-*/
-
 exports.login_post = [
     body('username').notEmpty().withMessage('Please enter a username').escape(),
     body('password').notEmpty().withMessage('Please enter a password').escape(),
@@ -74,6 +67,10 @@ exports.login_post = [
             })(req, res, next);
         }
     }
+];
+
+exports.guest_login_get = [
+
 ];
 
 exports.create_account_get = function(req, res, next) {
